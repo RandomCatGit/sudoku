@@ -36,17 +36,17 @@ public class Sudoku {
 
 	public static void main(String[] args) {
 		int[][] sudoku = new int[9][9];
-		sudoku = fixValues(sudoku, new int[] {
-				0, 0, 1 },
-				new int[] {
-						2, 2, 1 });
+//		sudoku = fixValues(sudoku, new int[] {
+//				0, 0, 1 },
+//				new int[] {
+//						2, 2, 1 });
 //		generateRowSequences();
 //		sudoku = fillQuadrant(sudoku, 1);
 //		sudoku = fillQuadrant(sudoku, 2);
 //		sudoku = fillQuadrant(sudoku, 3);
-//		sudoku = generateSudokuBoard(sudoku);
+		sudoku = generateSudokuBoard(sudoku);
 //		printBoard(sudoku);
-		checkBoardPass(sudoku);
+//		checkBoardPass(sudoku);
 		printBorderedBoard(sudoku);
 	}
 
