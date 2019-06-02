@@ -1,20 +1,28 @@
 package com.sudoku;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
 /**
- * Sudoku is class for performing sudoku prototyping.
+ * Sudoku is class contains API for sudoku game such as generating a random board, removing random numbers and prining
+ * the board.
  *
  * @author RandomCatGit
  */
 public class Sudoku {
-	private static final Random random = new Random();
 
-	private static int[][] fixedMap = new int[9][9];
+	private final Random random = new Random();
 
-	private static final int[][] quadMap = {
+	private int[][] fixedMap = new int[9][9];
+
+	/*
+	 * quadMap is the quadrant mapping of sudoku number positions where each number corresponds to the quadrant the
+	 * number is at.
+	 */
+	private final int[][] quadMap = {
 			{
 					1, 1, 1, 2, 2, 2, 3, 3, 3 },
 			{
@@ -34,7 +42,7 @@ public class Sudoku {
 			{
 					7, 7, 7, 8, 8, 8, 9, 9, 9 } };
 
-	public static void main(String[] args) {
+	public void main(String[] args) {
 		int[][] sudoku = new int[9][9];
 //		sudoku = fixValues(sudoku, new int[] {
 //				0, 0, 1 },
@@ -45,9 +53,33 @@ public class Sudoku {
 //		sudoku = fillQuadrant(sudoku, 2);
 //		sudoku = fillQuadrant(sudoku, 3);
 		sudoku = generateSudokuBoard(sudoku);
+		sudoku = removeRandom(sudoku, 40);
 //		printBoard(sudoku);
 //		checkBoardPass(sudoku);
 		printBorderedBoard(sudoku);
+	}
+
+	/**
+	 * removeRandom method is used for
+	 * 
+	 * @param sudoku
+	 * @param i
+	 * @return
+	 */
+	private int[][] removeRandom(int[][] sudoku, int removeCount) {
+		List<String> removedList = new LinkedList<String>();
+		int x = 0, y = 0;
+		String key = null;
+		for (int i = 0; i < removeCount; i++) {
+			while (key == null || removedList.indexOf(key) != -1) {
+				x = random.nextInt(9);
+				y = random.nextInt(9);
+				key = String.valueOf(x) + String.valueOf(y);
+			}
+			removedList.add(key);
+			sudoku[x][y] = 0;
+		}
+		return sudoku;
 	}
 
 	/**
@@ -56,7 +88,7 @@ public class Sudoku {
 	 * @param sudoku
 	 * @return
 	 */
-	private static int[][] fixValues(int[][] sudoku, int[]... markData) {
+	private int[][] fixValues(int[][] sudoku, int[]... markData) {
 		for (int[] data : markData) {
 			if (data[0] > 8 || data[1] > 8 || data[0] < 0 || data[1] < 0 || data[2] > 9 || data[2] < 1) {
 				System.err.println("Illegal table/data values");
@@ -73,7 +105,7 @@ public class Sudoku {
 	 * 
 	 * @param sudoku
 	 */
-	private static void printBorderedBoard(int[][] sudoku) {
+	private void printBorderedBoard(int[][] sudoku) {
 		for (int i = 0; i < 9; i++) {
 			if (i == 0 || i == 3 || i == 6) {
 				System.out.println("-------------------------------");
@@ -82,7 +114,7 @@ public class Sudoku {
 				if (j == 0 || j == 3 || j == 6) {
 					System.out.print("|");
 				}
-				System.out.print(" " + sudoku[i][j] + " ");
+				System.out.print(" " + (sudoku[i][j] == 0 ? " " : sudoku[i][j]) + " ");
 				if (j == 8) {
 					System.out.print("|");
 				}
@@ -100,7 +132,7 @@ public class Sudoku {
 	 * @param i
 	 * @return
 	 */
-	private static int[][] fillQuadrant(int[][] sudoku, int i) {
+	private int[][] fillQuadrant(int[][] sudoku, int i) {
 		int rs, re, cs, ce;
 		if (i < 4) {
 			rs = 0;
@@ -143,7 +175,7 @@ public class Sudoku {
 	 * @return
 	 * 
 	 */
-	private static int[][] generateSudokuBoard(int[][] sudoku) {
+	private int[][] generateSudokuBoard(int[][] sudoku) {
 		int count = 0;
 		for (int r = 0; r < 9; r++) {
 			for (int c = 0; c < 9; c++) {
@@ -187,7 +219,7 @@ public class Sudoku {
 	 * 
 	 * @param sudoku
 	 */
-	private static boolean checkBoardPass(int[][] sudoku) {
+	private boolean checkBoardPass(int[][] sudoku) {
 		for (int r = 0; r < 9; r++) {
 			for (int c = 0; c < 9; c++) {
 				if (checkViolated(sudoku, r, c)) {
@@ -211,10 +243,10 @@ public class Sudoku {
 	 * 
 	 * @param sudoku
 	 */
-	private static void printBoard(int[][] sudoku) {
+	private void printBoard(int[][] sudoku) {
 		for (int r = 0; r < 9; r++) {
 			for (int c = 0; c < 9; c++) {
-				System.out.print(sudoku[r][c]);
+				System.out.print(sudoku[r][c] == 0 ? " " : sudoku[r][c]);
 			}
 			System.out.println();
 		}
@@ -229,7 +261,7 @@ public class Sudoku {
 	 * @param random2
 	 * @return
 	 */
-	private static boolean checkViolated(int[][] sudoku, int r, int c, int random) {
+	private boolean checkViolated(int[][] sudoku, int r, int c, int random) {
 		int[] row = getRow(sudoku, r);
 		int[] col = getCol(sudoku, c);
 		if (checkIfPresent(row, random) || checkIfPresent(col, random) || checkQuardrant(sudoku, r, c, random)) {
@@ -238,7 +270,7 @@ public class Sudoku {
 		return false;
 	}
 
-	private static boolean checkViolated(int[][] sudoku, int r, int c) {
+	private boolean checkViolated(int[][] sudoku, int r, int c) {
 		if (sudoku[r][c] == 0) {
 			return false; // unfilled spot. No need to check.
 		}
@@ -261,7 +293,7 @@ public class Sudoku {
 	 * @param c
 	 * @return
 	 */
-	private static boolean checkQuardrant(int[][] sudoku, int q) {
+	private boolean checkQuardrant(int[][] sudoku, int q) {
 		Set<Integer> checkSet = new HashSet<>();
 		int[][] quad = getQuadrant(sudoku, q);
 		for (int i = 0; i < 3; i++) {
@@ -283,7 +315,7 @@ public class Sudoku {
 //	 * @param sudoku
 //	 * @return
 //	 */
-//	private static boolean checkQuardrants(int[][] sudoku) {
+//	private  boolean checkQuardrants(int[][] sudoku) {
 //		check: for (int q = 1; q <= 9; q++) {
 //			Set<Integer> vals = new HashSet<Integer>();
 //			int[][] quad = getQuadrant(sudoku, q);
@@ -313,7 +345,7 @@ public class Sudoku {
 	 * @param random
 	 * @return
 	 */
-	private static boolean checkQuardrant(int[][] sudoku, int r, int c, int random) {
+	private boolean checkQuardrant(int[][] sudoku, int r, int c, int random) {
 		int[][] quad = getQuadrant(sudoku, r, c);
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
@@ -336,7 +368,7 @@ public class Sudoku {
 	 * @param c
 	 * @return
 	 */
-	private static int[][] getQuadrant(int[][] sudoku, int r, int c) {
+	private int[][] getQuadrant(int[][] sudoku, int r, int c) {
 		return getQuadrant(sudoku, quadMap[r][c]);
 	}
 
@@ -347,7 +379,7 @@ public class Sudoku {
 	 * @param q
 	 * @return
 	 */
-	private static int[][] getQuadrant(int[][] sudoku, int q) {
+	private int[][] getQuadrant(int[][] sudoku, int q) {
 		int[][] quad = new int[3][3];
 		int rs, re, cs, ce;
 		if (q < 4) {
@@ -385,7 +417,7 @@ public class Sudoku {
 	 * @param random2
 	 * @return
 	 */
-	private static boolean checkIfPresent(int[] seq, int random) {
+	private boolean checkIfPresent(int[] seq, int random) {
 		for (int i = 0; i < 9; i++) {
 			if (seq[i] == random) {
 				return true;
@@ -401,7 +433,7 @@ public class Sudoku {
 	 * @param r
 	 * @return
 	 */
-	private static int[] getRow(int[][] sudoku, int r) {
+	private int[] getRow(int[][] sudoku, int r) {
 		return new int[] {
 				sudoku[r][0], sudoku[r][1], sudoku[r][2], sudoku[r][3], sudoku[r][4], sudoku[r][5], sudoku[r][6],
 				sudoku[r][7], sudoku[r][8] };
@@ -414,7 +446,7 @@ public class Sudoku {
 	 * @param c
 	 * @return
 	 */
-	private static int[] getCol(int[][] sudoku, int c) {
+	private int[] getCol(int[][] sudoku, int c) {
 		return new int[] {
 				sudoku[0][c], sudoku[1][c], sudoku[2][c], sudoku[3][c], sudoku[4][c], sudoku[5][c], sudoku[6][c],
 				sudoku[7][c], sudoku[8][c] };
@@ -425,7 +457,7 @@ public class Sudoku {
 	 * 
 	 * @return
 	 */
-	private static int getRandom() {
+	private int getRandom() {
 		return random.nextInt(9) + 1;
 	}
 
@@ -434,7 +466,7 @@ public class Sudoku {
 	 * 362880 possibilities
 	 * 
 	 */
-	private static void generateRowSequences() {
+	private void generateRowSequences() {
 		int count = 0;
 		for (int i = 123456789; i <= 987654321; i++) {
 			if (checkIfRow(i)) {
@@ -450,7 +482,7 @@ public class Sudoku {
 	 * 
 	 * @return
 	 */
-	private static boolean checkIfRow(int i) {
+	private boolean checkIfRow(int i) {
 		String s = String.valueOf(i);
 		if (s.contains("0")) { // should not contain a 0
 			return false;
@@ -472,7 +504,7 @@ public class Sudoku {
 	 * @param nums
 	 * @return
 	 */
-	private static int getSum(int[] nums) {
+	private int getSum(int[] nums) {
 		int sum = 0;
 		for (int i = 0; i < 9; i++) {
 			sum += nums[i];
@@ -486,7 +518,7 @@ public class Sudoku {
 	 * @param i
 	 * @return
 	 */
-	private static int[] getNumFromRow(String s) {
+	private int[] getNumFromRow(String s) {
 		return new int[] {
 				ifs(s, 0), ifs(s, 1), ifs(s, 2), ifs(s, 3), ifs(s, 4), ifs(s, 5), ifs(s, 6), ifs(s, 7), ifs(s, 8) };
 	}
@@ -497,7 +529,7 @@ public class Sudoku {
 	 * @param s
 	 * @param i
 	 */
-	private static int ifs(String s, int i) {
+	private int ifs(String s, int i) {
 		return Integer.parseInt(String.valueOf(s.charAt(i)));
 	}
 }
