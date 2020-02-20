@@ -44,29 +44,45 @@ public class Sudoku {
 
 	public void main(String[] args) {
 		int[][] sudoku = new int[9][9];
-//		sudoku = fixValues(sudoku, new int[] {
-//				0, 0, 1 },
-//				new int[] {
-//						2, 2, 1 });
+		sudoku = fixValuesByData(sudoku, new int[][] {
+				{
+						9, 8, 2, 7, 3, 6, 5, 4, 1 },
+				{
+						5, 4, 3, 9, 2, 1, 8, 6, 7 },
+				{
+						7, 6, 1, 5, 4, 8, 3, 9, 2 },
+				{
+						6, 2, 4, 1, 8, 9, 7, 5, 3 },
+				{
+						1, 5, 7, 3, 6, 2, 9, 8, 4 },
+				{
+						8, 3, 9, 4, 7, 5, 1, 2, 6 },
+				{
+						4, 9, 6, 8, 1, 3, 2, 7, 5 },
+				{
+						3, 7, 5, 2, 9, 4, 6, 1, 8 },
+				{
+						2, 1, 8, 6, 5, 7, 4, 3, 9 } });
 //		generateRowSequences();
 //		sudoku = fillQuadrant(sudoku, 1);
 //		sudoku = fillQuadrant(sudoku, 2);
 //		sudoku = fillQuadrant(sudoku, 3);
+		sudoku = removeRandom(sudoku, 5);
 		sudoku = generateSudokuBoard(sudoku);
-		sudoku = removeRandom(sudoku, 40);
-//		printBoard(sudoku);
+		printBoard(sudoku);
 //		checkBoardPass(sudoku);
-		printBorderedBoard(sudoku);
+//		printBorderedBoard(sudoku);
 	}
 
 	/**
-	 * removeRandom method is used for
+	 * removeRandom method is used for removing removeCount number of random numbers from the already solved sudoku
+	 * number array.
 	 * 
 	 * @param sudoku
-	 * @param i
+	 * @param removeCount
 	 * @return
 	 */
-	private int[][] removeRandom(int[][] sudoku, int removeCount) {
+	public int[][] removeRandom(int[][] sudoku, int removeCount) {
 		List<String> removedList = new LinkedList<String>();
 		int x = 0, y = 0;
 		String key = null;
@@ -83,15 +99,36 @@ public class Sudoku {
 	}
 
 	/**
-	 * fixValues method is used for
+	 * fixValues method is used for fixing predefined sudoku values on board.
 	 * 
 	 * @param sudoku
+	 * @param markData fixes values in board, values are fixed iff markdata value [1,9]
 	 * @return
 	 */
-	private int[][] fixValues(int[][] sudoku, int[]... markData) {
+	public int[][] fixValuesByData(int[][] sudoku, int[][] markData) {
+		int data;
+		for (int row = 0; row < 9; row++) {
+			for (int col = 0; col < 9; col++) {
+				data = markData[row][col];
+				if (data > 0 && data < 10) {
+					sudoku[row][col] = data;
+				}
+			}
+		}
+		return sudoku;
+	}
+
+	/**
+	 * fixValues method is used for fixing predefined sudoku values on board.
+	 * 
+	 * @param sudoku
+	 * @param markData fixes values in board, Format: new int[] {x, y, value}; x,y - [0,8]; value - [1,9]
+	 * @return
+	 */
+	public int[][] fixValuesByRowCol(int[][] sudoku, int[]... markData) {
 		for (int[] data : markData) {
 			if (data[0] > 8 || data[1] > 8 || data[0] < 0 || data[1] < 0 || data[2] > 9 || data[2] < 1) {
-				System.err.println("Illegal table/data values");
+				throw new IndexOutOfBoundsException("Illegal table/data values");
 			} else {
 				sudoku[data[0]][data[1]] = data[2];
 				fixedMap[data[0]][data[1]] = 1;
@@ -101,11 +138,11 @@ public class Sudoku {
 	}
 
 	/**
-	 * printBorderedBoard method is used for
+	 * printBorderedBoard method is used for printing sudoku data in a bordered and pretty way.
 	 * 
 	 * @param sudoku
 	 */
-	private void printBorderedBoard(int[][] sudoku) {
+	public void printBorderedBoard(int[][] sudoku) {
 		for (int i = 0; i < 9; i++) {
 			if (i == 0 || i == 3 || i == 6) {
 				System.out.println("-------------------------------");
@@ -125,43 +162,43 @@ public class Sudoku {
 	}
 
 	/**
-	 * fillQuadrant method is used for
+	 * fillQuadrant method is used for fill a particular quadrant.
 	 * 
 	 * @param sudoku
-	 * 
-	 * @param i
+	 * @param quadrant is the quadrant to fill
 	 * @return
 	 */
-	private int[][] fillQuadrant(int[][] sudoku, int i) {
-		int rs, re, cs, ce;
-		if (i < 4) {
-			rs = 0;
-			re = 2;
-		} else if (i > 3 && i < 7) {
-			rs = 3;
-			re = 5;
+	public int[][] fillQuadrant(int[][] sudoku, int quadrant) {
+		int rowStart, rowEnd, columnStart, columnEnd, rnd;
+		boolean check;
+		if (quadrant < 4) {
+			rowStart = 0;
+			rowEnd = 2;
+		} else if (quadrant > 3 && quadrant < 7) {
+			rowStart = 3;
+			rowEnd = 5;
 		} else {
-			rs = 6;
-			re = 8;
+			rowStart = 6;
+			rowEnd = 8;
 		}
-		if (i == 1 || i == 4 || i == 7) {
-			cs = 0;
-			ce = 2;
-		} else if (i == 2 || i == 5 || i == 8) {
-			cs = 3;
-			ce = 5;
+		if (quadrant == 1 || quadrant == 4 || quadrant == 7) {
+			columnStart = 0;
+			columnEnd = 2;
+		} else if (quadrant == 2 || quadrant == 5 || quadrant == 8) {
+			columnStart = 3;
+			columnEnd = 5;
 		} else {
-			cs = 6;
-			ce = 8;
+			columnStart = 6;
+			columnEnd = 8;
 		}
-		for (int r = rs; r <= re; r++) {
-			for (int c = cs; c <= ce; c++) {
-				int rnd = 0;
-				boolean check = true;
+		for (int row = rowStart; row <= rowEnd; row++) {
+			for (int col = columnStart; col <= columnEnd; col++) {
+				rnd = 0;
+				check = true;
 				while (check) {
-					check = checkViolated(sudoku, r, c, rnd = getRandom());
-					System.out.println("Running " + r + " " + c + " checking " + rnd);
-					sudoku[r][c] = rnd;
+					check = checkViolated(sudoku, row, col, rnd = getRandom());
+					System.out.println("Running " + row + " " + col + " checking " + rnd);
+					sudoku[row][col] = rnd;
 				}
 			}
 		}
@@ -175,31 +212,37 @@ public class Sudoku {
 	 * @return
 	 * 
 	 */
-	private int[][] generateSudokuBoard(int[][] sudoku) {
-		int count = 0;
+	public int[][] generateSudokuBoard(int[][] sudoku) {
+		int[][] backup = sudoku; // TODO keep memory of what numbers already tried and failed in each position. int[][][];
+		int count = 0, rnd;
+		boolean check;
+		Set<Integer> exhaust;
 		for (int r = 0; r < 9; r++) {
+			exhaust = new HashSet<>();
 			for (int c = 0; c < 9; c++) {
-				int rnd = 0;
-				boolean check = true;
-				Set<Integer> exhaust = new HashSet<>();
+				if (sudoku[r][c] != 0) {
+					exhaust.add(sudoku[r][c]);
+					continue;
+				}
+				rnd = 0;
+				check = true;
 				while (check) {
-					rnd = getRandom();
+					rnd = getRandom(exhaust);
 					check = checkViolated(sudoku, r, c, rnd);
-					exhaust.add(Integer.parseInt(String.valueOf(rnd)));
+					exhaust.add(rnd);
 //					System.out.println("Running " + r + " " + c + " checking " + rnd);
 					count++;
 //					printBorderedBoard(sudoku);
 					if (exhaust.size() == 9) {
+						exhaust = new HashSet<>();
 //						System.out.println("Exausted. Backtracked to previous row");
-						sudoku[r] = new int[] {
-								0, 0, 0, 0, 0, 0, 0, 0, 0 };
+						sudoku[r] = backup[r]; // backtracking
 						if (r == 0) {
 							c = -1;
 							break;
 						}
 						r--;
-						sudoku[r] = new int[] {
-								0, 0, 0, 0, 0, 0, 0, 0, 0 };
+						sudoku[r] = backup[r];
 						c = -1;
 						break;
 					}
@@ -219,7 +262,7 @@ public class Sudoku {
 	 * 
 	 * @param sudoku
 	 */
-	private boolean checkBoardPass(int[][] sudoku) {
+	public boolean checkBoardPass(int[][] sudoku) {
 		for (int r = 0; r < 9; r++) {
 			for (int c = 0; c < 9; c++) {
 				if (checkViolated(sudoku, r, c)) {
@@ -243,7 +286,7 @@ public class Sudoku {
 	 * 
 	 * @param sudoku
 	 */
-	private void printBoard(int[][] sudoku) {
+	public void printBoard(int[][] sudoku) {
 		for (int r = 0; r < 9; r++) {
 			for (int c = 0; c < 9; c++) {
 				System.out.print(sudoku[r][c] == 0 ? " " : sudoku[r][c]);
@@ -261,7 +304,7 @@ public class Sudoku {
 	 * @param random2
 	 * @return
 	 */
-	private boolean checkViolated(int[][] sudoku, int r, int c, int random) {
+	public boolean checkViolated(int[][] sudoku, int r, int c, int random) {
 		int[] row = getRow(sudoku, r);
 		int[] col = getCol(sudoku, c);
 		if (checkIfPresent(row, random) || checkIfPresent(col, random) || checkQuardrant(sudoku, r, c, random)) {
@@ -270,7 +313,7 @@ public class Sudoku {
 		return false;
 	}
 
-	private boolean checkViolated(int[][] sudoku, int r, int c) {
+	public boolean checkViolated(int[][] sudoku, int r, int c) {
 		if (sudoku[r][c] == 0) {
 			return false; // unfilled spot. No need to check.
 		}
@@ -293,7 +336,7 @@ public class Sudoku {
 	 * @param c
 	 * @return
 	 */
-	private boolean checkQuardrant(int[][] sudoku, int q) {
+	public boolean checkQuardrant(int[][] sudoku, int q) {
 		Set<Integer> checkSet = new HashSet<>();
 		int[][] quad = getQuadrant(sudoku, q);
 		for (int i = 0; i < 3; i++) {
@@ -345,7 +388,7 @@ public class Sudoku {
 	 * @param random
 	 * @return
 	 */
-	private boolean checkQuardrant(int[][] sudoku, int r, int c, int random) {
+	public boolean checkQuardrant(int[][] sudoku, int r, int c, int random) {
 		int[][] quad = getQuadrant(sudoku, r, c);
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
@@ -368,18 +411,18 @@ public class Sudoku {
 	 * @param c
 	 * @return
 	 */
-	private int[][] getQuadrant(int[][] sudoku, int r, int c) {
+	public int[][] getQuadrant(int[][] sudoku, int r, int c) {
 		return getQuadrant(sudoku, quadMap[r][c]);
 	}
 
 	/**
-	 * getQuadrant method is used for
+	 * getQuadrant method returns a particular quadrant from the board.
 	 * 
 	 * @param sudoku
 	 * @param q
 	 * @return
 	 */
-	private int[][] getQuadrant(int[][] sudoku, int q) {
+	public int[][] getQuadrant(int[][] sudoku, int q) {
 		int[][] quad = new int[3][3];
 		int rs, re, cs, ce;
 		if (q < 4) {
@@ -411,13 +454,13 @@ public class Sudoku {
 	}
 
 	/**
-	 * checkIfPresent method is used for
+	 * checkIfPresent method is used to check if a particular number is present in the current sequence.
 	 * 
-	 * @param row
-	 * @param random2
+	 * @param seq
+	 * @param random
 	 * @return
 	 */
-	private boolean checkIfPresent(int[] seq, int random) {
+	public boolean checkIfPresent(int[] seq, int random) {
 		for (int i = 0; i < 9; i++) {
 			if (seq[i] == random) {
 				return true;
@@ -433,7 +476,7 @@ public class Sudoku {
 	 * @param r
 	 * @return
 	 */
-	private int[] getRow(int[][] sudoku, int r) {
+	public int[] getRow(int[][] sudoku, int r) {
 		return new int[] {
 				sudoku[r][0], sudoku[r][1], sudoku[r][2], sudoku[r][3], sudoku[r][4], sudoku[r][5], sudoku[r][6],
 				sudoku[r][7], sudoku[r][8] };
@@ -446,7 +489,7 @@ public class Sudoku {
 	 * @param c
 	 * @return
 	 */
-	private int[] getCol(int[][] sudoku, int c) {
+	public int[] getCol(int[][] sudoku, int c) {
 		return new int[] {
 				sudoku[0][c], sudoku[1][c], sudoku[2][c], sudoku[3][c], sudoku[4][c], sudoku[5][c], sudoku[6][c],
 				sudoku[7][c], sudoku[8][c] };
@@ -457,8 +500,21 @@ public class Sudoku {
 	 * 
 	 * @return
 	 */
-	private int getRandom() {
+	public int getRandom() {
 		return random.nextInt(9) + 1;
+	}
+
+	/**
+	 * getRandom method is used for returning a value not present in exhaust set.
+	 * 
+	 * @param exhaust
+	 * @return
+	 */
+	private int getRandom(Set<Integer> exhaust) {
+		int check;
+		while (exhaust.contains(check = getRandom()))
+			;
+		return check;
 	}
 
 	/**
@@ -466,7 +522,7 @@ public class Sudoku {
 	 * 362880 possibilities
 	 * 
 	 */
-	private void generateRowSequences() {
+	public void generateRowSequences() {
 		int count = 0;
 		for (int i = 123456789; i <= 987654321; i++) {
 			if (checkIfRow(i)) {
@@ -482,7 +538,7 @@ public class Sudoku {
 	 * 
 	 * @return
 	 */
-	private boolean checkIfRow(int i) {
+	public boolean checkIfRow(int i) {
 		String s = String.valueOf(i);
 		if (s.contains("0")) { // should not contain a 0
 			return false;
@@ -504,7 +560,7 @@ public class Sudoku {
 	 * @param nums
 	 * @return
 	 */
-	private int getSum(int[] nums) {
+	public int getSum(int[] nums) {
 		int sum = 0;
 		for (int i = 0; i < 9; i++) {
 			sum += nums[i];
@@ -518,7 +574,7 @@ public class Sudoku {
 	 * @param i
 	 * @return
 	 */
-	private int[] getNumFromRow(String s) {
+	public int[] getNumFromRow(String s) {
 		return new int[] {
 				ifs(s, 0), ifs(s, 1), ifs(s, 2), ifs(s, 3), ifs(s, 4), ifs(s, 5), ifs(s, 6), ifs(s, 7), ifs(s, 8) };
 	}
@@ -529,7 +585,7 @@ public class Sudoku {
 	 * @param s
 	 * @param i
 	 */
-	private int ifs(String s, int i) {
+	public int ifs(String s, int i) {
 		return Integer.parseInt(String.valueOf(s.charAt(i)));
 	}
 }
